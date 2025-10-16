@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AstaHR твой помощник в мире HR </title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f7fa;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .tabs {
+            display: flex;
+            background: white;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .tab {
+            padding: 15px 30px;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            flex: 1;
+            text-align: center;
+        }
+
+        .tab:hover {
+            background: #f8f9fa;
+        }
+
+        .tab.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .table-container {
+            overflow-x: auto;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 800px;
+        }
+
+        th {
+            background: #f8f9fa;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            color: #2d3748;
+            border-bottom: 2px solid #e2e8f0;
+            position: sticky;
+            top: 0;
+        }
+
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e2e8f0;
+            color: #4a5568;
+        }
+
+        tr:hover {
+            background: #f7fafc;
+        }
+
+        .status {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-align: center;
+            display: inline-block;
+        }
+
+        .status-approved {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+
+        .status-pending {
+            background: #fed7d7;
+            color: #742a2a;
+        }
+
+        .status-review {
+            background: #feebcb;
+            color: #744210;
+        }
+
+        .status-in-progress {
+            background: #bee3f8;
+            color: #1a365d;
+        }
+
+        .status-completed {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+
+        .priority-high {
+            color: #e53e3e;
+            font-weight: 600;
+        }
+
+        .priority-medium {
+            color: #d69e2e;
+            font-weight: 600;
+        }
+
+        .priority-normal {
+            color: #38a169;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: #718096;
+            font-size: 14px;
+        }
+
+        .potential-high {
+            color: #38a169;
+            font-weight: 600;
+        }
+
+        .potential-medium {
+            color: #d69e2e;
+            font-weight: 600;
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 2em;
+            }
+
+            .tab {
+                padding: 12px 15px;
+                font-size: 14px;
+            }
+
+            .tab-content {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>AstaHR</h1>
+            <p>Твой помощник в мире HR </p>
+        </div>
+
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-number" id="totalEmployees">5</div>
+                <div class="stat-label">Сотрудников рассмотрено</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="pendingDecisions">2</div>
+                <div class="stat-label">Ожидают решения</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="promotions">2</div>
+                <div class="stat-label">Рекомендовано к повышению</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="completionRate">40%</div>
+                <div class="stat-label">Выполнение решений</div>
+            </div>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="openTab('decisions')">Решения комиссии</button>
+            <button class="tab" onclick="openTab('employees')">Сотрудники</button>
+            <button class="tab" onclick="openTab('analytics')">Аналитика</button>
+            <button class="tab" onclick="openTab('actions')">Действия</button>
+        </div>
+
+        <!-- Таблица решений комиссии -->
+        <div id="decisions" class="tab-content active">
+            <h2>Решения кадровой комиссии</h2>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID сотрудника</th>
+                            <th>ФИО</th>
+                            <th>Должность</th>
+                            <th>Отдел</th>
+                            <th>Тип решения</th>
+                            <th>Рекомендация</th>
+                            <th>Статус</th>
+                            <th>Приоритет</th>
+                            <th>Дата решения</th>
+                        </tr>
+                    </thead>
+                    <tbody id="decisionsTable">
+                        <!-- Данные будут заполнены через JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Таблица сотрудников -->
+        <div id="employees" class="tab-content">
+            <h2>Список сотрудников</h2>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>ФИО</th>
+                            <th>Должность</th>
+                            <th>Отдел</th>
+                            <th>Дата найма</th>
+                            <th>Оценка KPI</th>
+                            <th>Уровень компетенций</th>
+                            <th>Потенциал</th>
+                        </tr>
+                    </thead>
+                    <tbody id="employeesTable">
+                        <!-- Данные будут заполнены через JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Таблица аналитики -->
+        <div id="analytics" class="tab-content">
+            <h2>Аналитика и метрики</h2>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Отдел</th>
+                            <th>Рассмотрено сотрудников</th>
+                            <th>Средний KPI</th>
+                            <th>Процент повышений</th>
+                            <th>Высокий потенциал</th>
+                            <th>Время принятия решений (дни)</th>
+                            <th>Эффективность отдела</th>
+                        </tr>
+                    </thead>
+                    <tbody id="analyticsTable">
+                        <!-- Данные будут заполнены через JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Таблица действий -->
+        <div id="actions" class="tab-content">
+            <h2>План действий</h2>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Действие</th>
+                            <th>Ответственный</th>
+                            <th>Срок выполнения</th>
+                            <th>Статус</th>
+                            <th>Прогресс</th>
+                            <th>Приоритет</th>
+                        </tr>
+                    </thead>
+                    <tbody id="actionsTable">
+                        <!-- Данные будут заполнены через JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Данные для пяти указанных сотрудников
+        const commissionData = {
+            decisions: [
+                {
+                    employee_id: "EMP_2024_001",
+                    name: "Газзаев Андрей Алексеевич",
+                    position: "Team Lead разработки",
+                    department: "IT",
+                    decision_type: "promotion",
+                    recommendation: "Повышение до Senior Team Lead с увеличением зоны ответственности",
+                    status: "approved",
+                    priority: "high",
+                    date: "2024-01-15"
+                },
+                {
+                    employee_id: "EMP_2024_002",
+                    name: "Виноградов Александр Юрьевич",
+                    position: "Senior Python разработчик",
+                    department: "IT",
+                    decision_type: "development",
+                    recommendation: "Участие в программе архитектурного развития, менторинг junior-разработчиков",
+                    status: "pending",
+                    priority: "medium",
+                    date: "2024-01-15"
+                },
+                {
+                    employee_id: "EMP_2024_003",
+                    name: "Ильченко Игорь Александрович",
+                    position: "Менеджер проектов",
+                    department: "Управление проектами",
+                    decision_type: "promotion",
+                    recommendation: "Повышение до Руководителя проектного офиса",
+                    status: "review",
+                    priority: "high",
+                    date: "2024-01-10"
+                },
+                {
+                    employee_id: "EMP_2024_004",
+                    name: "Барган Алексей Геннадьевич",
+                    position: "Senior HR Business Partner",
+                    department: "HR",
+                    decision_type: "development",
+                    recommendation: "Программа развития компетенций в области HR analytics",
+                    status: "approved",
+                    priority: "medium",
+                    date: "2024-01-08"
+                },
+                {
+                    employee_id: "EMP_2024_005",
+                    name: "Изюмская Алена Сергеевна",
+                    position: "Маркетолог-аналитик",
+                    department: "Маркетинг",
+                    decision_type: "rotation",
+                    recommendation: "Ротация в отдел продуктовой аналитики на 6 месяцев",
+                    status: "pending",
+                    priority: "normal",
+                    date: "2024-01-12"
+                }
+            ],
+            employees: [
+                {
+                    id: "EMP_2024_001",
+                    name: "Газзаев Андрей Алексеевич",
+                    position: "Team Lead разработки",
+                    department: "IT",
+                    hire_date: "2019-08-12",
+                    kpi_score: 4.8,
+                    competency_level: 4.9,
+                    potential: "high"
+                },
+                {
+                    id: "EMP_2024_002",
+                    name: "Виноградов Александр Юрьевич",
+                    position: "Senior Python разработчик",
+                    department: "IT",
+                    hire_date: "2020-11-05",
+                    kpi_score: 4.5,
+                    competency_level: 4.6,
+                    potential: "high"
+                },
+                {
+                    id: "EMP_2024_003",
+                    name: "Ильченко Игорь Александрович",
+                    position: "Менеджер проектов",
+                    department: "Управление проектами",
+                    hire_date: "2021-03-22",
+                    kpi_score: 4.7,
+                    competency_level: 4.5,
+                    potential: "high"
+                },
+                {
+                    id: "EMP_2024_004",
+                    name: "Барган Алексей Геннадьевич",
+                    position: "Senior HR Business Partner",
+                    department: "HR",
+                    hire_date: "2018-05-14",
+                    kpi_score: 4.4,
+                    competency_level: 4.6,
+                    potential: "medium"
+                },
+                {
+                    id: "EMP_2024_005",
+                    name: "Изюмская Алена Сергеевна",
+                    position: "Маркетолог-аналитик",
+                    department: "Маркетинг",
+                    hire_date: "2022-09-30",
+                    kpi_score: 4.2,
+                    competency_level: 4.3,
+                    potential: "high"
+                }
+            ],
+            analytics: [
+                {
+                    department: "IT",
+                    employees_reviewed: 2,
+                    average_kpi: 4.65,
+                    promotion_rate: "50%",
+                    high_potential: 2,
+                    decision_time: 2.5,
+                    efficiency: "95%"
+                },
+                {
+                    department: "Управление проектами",
+                    employees_reviewed: 1,
+                    average_kpi: 4.7,
+                    promotion_rate: "100%",
+                    high_potential: 1,
+                    decision_time: 3.0,
+                    efficiency: "92%"
+                },
+                {
+                    department: "HR",
+                    employees_reviewed: 1,
+                    average_kpi: 4.4,
+                    promotion_rate: "0%",
+                    high_potential: 0,
+                    decision_time: 2.0,
+                    efficiency: "88%"
+                },
+                {
+                    department: "Маркетинг",
+                    employees_reviewed: 1,
+                    average_kpi: 4.2,
+                    promotion_rate: "0%",
+                    high_potential: 1,
+                    decision_time: 4.0,
+                    efficiency: "85%"
+                }
+            ],
+            actions: [
+                {
+                    action: "Оформление приказа о повышении Газзаева А.А.",
+                    responsible: "Барган А.Г.",
+                    deadline: "2024-01-25",
+                    status: "in_progress",
+                    progress: "80%",
+                    priority: "high"
+                },
+                {
+                    action: "Разработка программы архитектурного развития для Виноградова А.Ю.",
+                    responsible: "Газзаев А.А.",
+                    deadline: "2024-02-10",
+                    status: "pending",
+                    progress: "10%",
+                    priority: "medium"
+                },
+                {
+                    action: "Собеседование с Ильченко И.А. на позицию Руководителя проектного офиса",
+                    responsible: "Директор по проектам",
+                    deadline: "2024-01-20",
+                    status: "completed",
+                    progress: "100%",
+                    priority: "high"
+                },
+                {
+                    action: "Организация курсов по HR analytics для Баргана А.Г.",
+                    responsible: "Начальник отдела обучения",
+                    deadline: "2024-02-28",
+                    status: "pending",
+                    progress: "0%",
+                    priority: "medium"
+                },
+                {
+                    action: "Подготовка плана ротации для Изюмской А.С.",
+                    responsible: "Руководитель маркетинга",
+                    deadline: "2024-01-30",
+                    status: "in_progress",
+                    progress: "60%",
+                    priority: "normal"
+                }
+            ]
+        };
+
+        // Функции для работы с вкладками
+        function openTab(tabName) {
+            const tabs = document.querySelectorAll('.tab-content');
+            tabs.forEach(tab => tab.classList.remove('active'));
+
+            const tabButtons = document.querySelectorAll('.tab');
+            tabButtons.forEach(button => button.classList.remove('active'));
+
+            document.getElementById(tabName).classList.add('active');
+            event.currentTarget.classList.add('active');
+        }
+
+        // Функция для отображения статуса
+        function getStatusBadge(status) {
+            const statusMap = {
+                'approved': {class: 'status-approved', text: 'Утверждено'},
+                'pending': {class: 'status-pending', text: 'Ожидает'},
+                'review': {class: 'status-review', text: 'На рассмотрении'},
+                'in_progress': {class: 'status-in-progress', text: 'В процессе'},
+                'completed': {class: 'status-completed', text: 'Завершено'},
+                'not_started': {class: 'status-pending', text: 'Не начато'}
+            };
+
+            const statusInfo = statusMap[status] || {class: 'status-pending', text: status};
+            return `<span class="status ${statusInfo.class}">${statusInfo.text}</span>`;
+        }
+
+        // Функция для отображения приоритета
+        function getPriorityBadge(priority) {
+            if (priority === 'high') {
+                return '<span class="priority-high">Высокий</span>';
+            } else if (priority === 'medium') {
+                return '<span class="priority-medium">Средний</span>';
+            } else {
+                return '<span class="priority-normal">Обычный</span>';
+            }
+        }
+
+        // Функция для отображения потенциала
+        function getPotentialBadge(potential) {
+            if (potential === 'high') {
+                return '<span class="potential-high">Высокий</span>';
+            } else {
+                return '<span class="potential-medium">Средний</span>';
+            }
+        }
+
+        // Заполнение таблицы решений
+        function renderDecisionsTable() {
+            const tbody = document.getElementById('decisionsTable');
+            tbody.innerHTML = '';
+
+            commissionData.decisions.forEach(decision => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${decision.employee_id}</td>
+                    <td><strong>${decision.name}</strong></td>
+                    <td>${decision.position}</td>
+                    <td>${decision.department}</td>
+                    <td>${getDecisionTypeText(decision.decision_type)}</td>
+                    <td>${decision.recommendation}</td>
+                    <td>${getStatusBadge(decision.status)}</td>
+                    <td>${getPriorityBadge(decision.priority)}</td>
+                    <td>${formatDate(decision.date)}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Заполнение таблицы сотрудников
+        function renderEmployeesTable() {
+            const tbody = document.getElementById('employeesTable');
+            tbody.innerHTML = '';
+
+            commissionData.employees.forEach(employee => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${employee.id}</td>
+                    <td><strong>${employee.name}</strong></td>
+                    <td>${employee.position}</td>
+                    <td>${employee.department}</td>
+                    <td>${formatDate(employee.hire_date)}</td>
+                    <td>${employee.kpi_score}/5.0</td>
+                    <td>${employee.competency_level}/5.0</td>
+                    <td>${getPotentialBadge(employee.potential)}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Заполнение таблицы аналитики
+        function renderAnalyticsTable() {
+            const tbody = document.getElementById('analyticsTable');
+            tbody.innerHTML = '';
+
+            commissionData.analytics.forEach(analytic => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><strong>${analytic.department}</strong></td>
+                    <td>${analytic.employees_reviewed}</td>
+                    <td>${analytic.average_kpi}/5.0</td>
+                    <td>${analytic.promotion_rate}</td>
+                    <td>${analytic.high_potential}</td>
+                    <td>${analytic.decision_time}</td>
+                    <td>${analytic.efficiency}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Заполнение таблицы действий
+        function renderActionsTable() {
+            const tbody = document.getElementById('actionsTable');
+            tbody.innerHTML = '';
+
+            commissionData.actions.forEach(action => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${action.action}</td>
+                    <td><strong>${action.responsible}</strong></td>
+                    <td>${formatDate(action.deadline)}</td>
+                    <td>${getStatusBadge(action.status)}</td>
+                    <td>
+                        <div style="background: #e2e8f0; border-radius: 10px; height: 8px; width: 100%; margin: 5px 0;">
+                            <div style="background: #667eea; height: 100%; border-radius: 10px; width: ${action.progress};"></div>
+                        </div>
+                        ${action.progress}
+                    </td>
+                    <td>${getPriorityBadge(action.priority)}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Вспомогательные функции
+        function getDecisionTypeText(type) {
+            const typeMap = {
+                'promotion': 'Повышение',
+                'development': 'Развитие',
+                'rotation': 'Ротация'
+            };
+            return typeMap[type] || type;
+        }
+
+        function formatDate(dateString) {
+            const options = { year: 'numeric', month: '2-digit', day: '2-digit' };
+            return new Date(dateString).toLocaleDateString('ru-RU', options);
+        }
+
+        // Обновление статистики
+        function updateStats() {
+            // Статистика уже задана в HTML, но можно динамически обновлять
+            const pendingDecisions = commissionData.decisions.filter(d => d.status === 'pending' || d.status === 'review').length;
+            const promotions = commissionData.decisions.filter(d => d.decision_type === 'promotion').length;
+
+            const completedActions = commissionData.actions.filter(a => a.status === 'completed').length;
+            const totalActions = commissionData.actions.length;
+            const completionRate = totalActions > 0 ? Math.round((completedActions / totalActions) * 100) : 0;
+
+            document.getElementById('pendingDecisions').textContent = pendingDecisions;
+            document.getElementById('promotions').textContent = promotions;
+            document.getElementById('completionRate').textContent = completionRate + '%';
+        }
+
+        // Инициализация при загрузке страницы
+        document.addEventListener('DOMContentLoaded', function() {
+            renderDecisionsTable();
+            renderEmployeesTable();
+            renderAnalyticsTable();
+            renderActionsTable();
+            updateStats();
+        });
+    </script>
+</body>
+</html>
